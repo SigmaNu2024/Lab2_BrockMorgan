@@ -4,14 +4,14 @@ import java.time.LocalDateTime;
 public class Deadline extends Event implements Completable {
     private boolean complete;
 
-    public Deadline(String name, LocalDateTime dateTime) {
-        super(name, dateTime);
+    public Deadline(String name, LocalDateTime deadline) {
+        super(name, deadline);
         this.complete = false;
     }
 
     @Override
     public String getName() {
-        return super.getDateTime().toString() + ": " + super.getName();
+        return super.name;
     }
 
     @Override

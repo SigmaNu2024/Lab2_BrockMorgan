@@ -3,38 +3,39 @@ import java.time.Duration;
 
 // Meeting class extending Event and implementing Completable
 public class Meeting extends Event implements Completable {
-    private LocalDateTime endDateTime;
+    private final LocalDateTime start;
+    private LocalDateTime end;
     private String location;
     private boolean complete;
 
-    public Meeting(String name, LocalDateTime dateTime, LocalDateTime endDateTime, String location) {
-        super();
+    public Meeting(String name, LocalDateTime start, LocalDateTime end, String location) {
+        super(name, start);
         this.name = name;
-        this.dateTime = dateTime;
-        this.endDateTime = endDateTime;
+        this.start = start;
+        this.end= end;
         this.location = location;
         this.complete = false;
     }
 
     @Override
     public String getName() {
-        return name;
+        return super.name;
     }
 
     public LocalDateTime getEndDateTime() {
-        return endDateTime;
+        return end;
     }
 
     public Duration getDuration() {
-        return Duration.between(dateTime, endDateTime);
+        return Duration.between(start, end);
     }
 
     public String getLocation() {
         return location;
     }
 
-    public void setEndDateTime(LocalDateTime EndDateTime) {
-        this.endDateTime = EndDateTime;
+    public void setEndDateTime(LocalDateTime end) {
+        this.end = end;
     }
 
     public void setLocation(String location) {

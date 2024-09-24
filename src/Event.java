@@ -1,20 +1,17 @@
 import java.time.LocalDateTime;
 
 // Abstract class representing an Event
-abstract class Event implements Comparable<Event> {
-    protected String name;
-    protected LocalDateTime dateTime;
+public abstract class Event implements Comparable<Event> {
+    public String name;
+    public LocalDateTime dateTime;
 
     public Event(String name, LocalDateTime dateTime) {
+        this.name = name;
+        this.dateTime = dateTime;
     }
 
-    public Event() {
 
-    }
-
-    public String getName() {
-        return null;
-    }
+    public abstract String getName();
 
     public LocalDateTime getDateTime() {
         return dateTime;

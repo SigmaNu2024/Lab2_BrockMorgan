@@ -17,9 +17,13 @@ public class Meeting extends Event implements Completable {
         this.complete = false;
     }
 
-    @Override
     public String getName() {
         return super.name;
+    }
+
+    @Override
+    public boolean isCompleted() {
+        return false;
     }
 
     public LocalDateTime getEndDateTime() {
@@ -34,6 +38,14 @@ public class Meeting extends Event implements Completable {
         return location;
     }
 
+    public void complete() {
+        this.complete = true;
+    }
+
+    public boolean isComplete() {
+        return complete;
+    }
+
     public void setEndDateTime(LocalDateTime end) {
         this.end = end;
     }
@@ -42,13 +54,4 @@ public class Meeting extends Event implements Completable {
         this.location = location;
     }
 
-    @Override
-    public void complete() {
-        this.complete = true;
-    }
-
-    @Override
-    public boolean isComplete() {
-        return complete;
-    }
 }

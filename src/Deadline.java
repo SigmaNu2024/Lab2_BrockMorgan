@@ -9,17 +9,20 @@ public class Deadline extends Event implements Completable {
         this.complete = false;
     }
 
-    @Override
     public String getName() {
         return super.name;
     }
 
     @Override
+    public boolean isCompleted() {
+        return false;
+    }
+
+
     public void complete() {
         this.complete = true;
     }
 
-    @Override
     public boolean isComplete() {
         return complete;
     }

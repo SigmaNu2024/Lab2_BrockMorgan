@@ -1,7 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-//import java.time.LocalDateTime;
-//import java.time.Month;
 
 
 public class EventPlanner {
@@ -12,9 +10,18 @@ public class EventPlanner {
         frame.setLayout(new BorderLayout());
 
         EventListPanel eventListPanel = new EventListPanel();
-        //addDefaultEvents(eventListPanel);
+        addDefaultEvents(eventListPanel);
 
         frame.add(eventListPanel, BorderLayout.CENTER);
         frame.setVisible(true);
+    }
+    static void addDefaultEvents(EventListPanel eventListPanel) {
+        // Default Meeting and Deadline
+        Deadline defaultDeadline = new Deadline("First Deadline", EventTester.deadline.minusDays(20) );
+        Meeting defaultMeeting = new Meeting("First Meeting", EventTester.start, EventTester.end, EventTester.location);
+
+        // Adds default events to the EventListPanel
+        eventListPanel.addEvent(defaultDeadline);
+        eventListPanel.addEvent(defaultMeeting);
     }
 }

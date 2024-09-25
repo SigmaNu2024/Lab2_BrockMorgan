@@ -1,46 +1,53 @@
 import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 
 public class EventPanel extends JPanel {
-    private final Event event;           // The event displayed by this panel
-    private JButton completeButton; // Button to mark the event as complete
+    private Event event;
+    private JButton completeButton;
 
     public EventPanel(Event event) {
         this.event = event;
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        setLayout(new GridLayout(0, 1)); // Simple vertical layout
+        initializeComponents();
+        updateUrgency();
+    }
 
+    private void initializeComponents() {
         // Display event details
         add(new JLabel("Name: " + event.getName()));
         add(new JLabel("Time: " + event.getDateTime()));
 
-        // Additional details for Meeting
-        if (event instanceof Meeting meeting) {
-            add(new JLabel("Duration: " + meeting.getDuration().toMinutes() + " minutes"));
+        if (event instanceof Meeting) {
+            Meeting meeting = (Meeting) event;
+            add(new JLabel("Duration: " + meeting.getDuration() + " hours"));
             add(new JLabel("Location: " + meeting.getLocation()));
         }
 
-        // Completion status and button for Completable events
+        // Complete button
+        completeButton = new JButton("Complete");
         if (event instanceof Completable) {
-            completeButton = new JButton("Complete");
             completeButton.addActionListener(e -> {
-                ((Completable) event).complete();
-                completeButton.setEnabled(false); // Disable after completion
-                updateCompletionStatus();
+                ((Completable) event).isComplete();
+                completeButton.setVisible(true); // Hide button after completion
+                updateUrgency();
             });
-            add(completeButton);
-            updateCompletionStatus(); // Initial status update
+        } else {
+            completeButton.setVisible(false); // Hide if not Completable
         }
+        add(completeButton, BorderLayout.EAST);
     }
 
-    private void updateCompletionStatus() {
-        if (event instanceof Completable && ((Completable) event).isComplete()) {
-            add(new JLabel("Status: Completed"));
-            completeButton.setEnabled(false); // Disable button if already completed
+    public void updateUrgency() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime eventTime = event.getDateTime();
+
+        if (eventTime.isBefore(now)) {
+            setBackground(Color.RED); // Overdue
+        } else if (eventTime.isBefore(now.plusHours(1))) {
+            setBackground(Color.YELLOW); // Imminent
         } else {
-            add(new JLabel("Status: In Progress"));
+            setBackground(Color.GREEN); // Distant
         }
     }
 }

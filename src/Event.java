@@ -4,12 +4,13 @@ import java.time.LocalDateTime;
 public abstract class Event implements Comparable<Event> {
     public String name;
     public LocalDateTime dateTime;
+    public boolean completed;
 
     public Event(String name, LocalDateTime dateTime) {
         this.name = name;
         this.dateTime = dateTime;
+        this.completed = false;
     }
-
 
     public abstract String getName();
 
@@ -25,8 +26,11 @@ public abstract class Event implements Comparable<Event> {
         this.name = name;
     }
 
-    @Override
     public int compareTo(Event e) {
         return this.dateTime.compareTo(e.dateTime);
     }
+
+    public abstract boolean isCompleted();
+
+    //public abstract boolean isCompleted();
 }

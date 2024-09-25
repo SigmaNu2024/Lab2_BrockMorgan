@@ -1,59 +1,111 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 
 public class EventListPanel extends JPanel {
-    private final ArrayList<Event> events;  // List of events to display
-    private JPanel displayPanel;       // Panel for displaying events
-    private JComboBox<String> sortDropDown; // Drop down for sorting
-    private JCheckBox filterCompleted; // Checkbox to filter completed events
-    private JButton addEventButton;    // Button to add new events
+    private ArrayList<Event> events = new ArrayList<>(); // List of events
+    private JPanel controlPanel = new JPanel(); // Control panel for buttons
+    private JPanel displayPanel = new JPanel(); // Display panel for event details
+    private JComboBox<String> sortDropDown; // Sort dropdown
+    private JCheckBox filterCompleted; // Filter checkbox for completed events
+    private JRadioButton showAll; // Radio button to show all events
+    private JRadioButton showDeadlines; // Radio button for deadlines
+    private JRadioButton showMeetings; // Radio button for meetings
+    private JButton addEventButton; // Button to add events
 
     public EventListPanel() {
-        events = new ArrayList<>();
         setLayout(new BorderLayout());
+        setupControls();
+        setupDisplayPanel();
+    }
 
-        // Control panel setup
-        JPanel controlPanel = new JPanel();
+    private void setupControls() {
+        controlPanel.setLayout(new FlowLayout());
+
+        // Sort dropdown
         sortDropDown = new JComboBox<>(new String[]{"Sort by Name", "Sort by Date"});
-        filterCompleted = new JCheckBox("Show Completed Events");
-        addEventButton = new JButton("Add Event");
-
-        // Add listeners
-        sortDropDown.addActionListener(e -> updateDisplay());
-        filterCompleted.addActionListener(e -> updateDisplay());
-        addEventButton.addActionListener(e -> new AddEventModel(this));
-
-        // Adding components to control panel
+        sortDropDown.addActionListener(e -> sortEvents());
         controlPanel.add(sortDropDown);
-        controlPanel.add(filterCompleted);
-        controlPanel.add(addEventButton);
-        add(controlPanel, BorderLayout.NORTH);
 
-        // Display panel setup
-        displayPanel = new JPanel();
+        // Filter for completed events
+        filterCompleted = new JCheckBox("Hide Completed Events");
+        filterCompleted.addItemListener(e -> updateDisplay());
+        controlPanel.add(filterCompleted);
+
+        // Event type filters
+        showAll = new JRadioButton("Show All", true);
+        showDeadlines = new JRadioButton("Show Deadlines");
+        showMeetings = new JRadioButton("Show Meetings");
+        ButtonGroup group = new ButtonGroup();
+        group.add(showAll);
+        group.add(showDeadlines);
+        group.add(showMeetings);
+
+        showAll.addActionListener(e -> updateDisplay());
+        showDeadlines.addActionListener(e -> updateDisplay());
+        showMeetings.addActionListener(e -> updateDisplay());
+
+        controlPanel.add(showAll);
+        controlPanel.add(showDeadlines);
+        controlPanel.add(showMeetings);
+
+        // Add event button
+        addEventButton = new JButton("Add Event");
+        addEventButton.addActionListener(this::openAddEventModal);
+        controlPanel.add(addEventButton);
+
+        add(controlPanel, BorderLayout.NORTH);
+    }
+
+    private void setupDisplayPanel() {
         displayPanel.setLayout(new BoxLayout(displayPanel, BoxLayout.Y_AXIS));
         add(displayPanel, BorderLayout.CENTER);
     }
 
-    // Method to add an event and update the display
+    private void openAddEventModal(ActionEvent e) {
+        AddEventModel modal = new AddEventModel(this);
+        modal.setVisible(true);
+    }
+
     public void addEvent(Event event) {
         events.add(event);
         updateDisplay();
     }
 
-    // Method to update the displayed events
     public void updateDisplay() {
         displayPanel.removeAll();
-        events.stream()
-                .filter(event -> filterCompleted.isSelected() || !(event instanceof Completable && ((Completable) event).isComplete()))
-                .sorted((e1, e2) -> sortDropDown.getSelectedItem().equals("Sort by Name")
-                        ? e1.getName().compareTo(e2.getName())
-                        : e1.getDateTime().compareTo(e2.getDateTime()))
-                .forEach(event -> displayPanel.add(new EventPanel(event)));
+        for (Event event : events) {
+            boolean showEvent = true;
 
-        displayPanel.revalidate();
-        displayPanel.repaint();
+            // Apply filtering based on the selected radio button
+            if (showDeadlines.isSelected() && !(event instanceof Deadline)) {
+                showEvent = false;
+            } else if (showMeetings.isSelected() && !(event instanceof Meeting)) {
+                showEvent = false;
+            }
+
+            // Apply filter for completed events
+            if (filterCompleted.isSelected() && event.isCompleted()) {
+                showEvent = false;
+            }
+
+            if (showEvent) {
+                displayPanel.add(new EventPanel(event));
+            }
+        }
+        revalidate();
+        repaint();
+    }
+
+    private void sortEvents() {
+        String selected = (String) sortDropDown.getSelectedItem();
+        if ("Sort by Name".equals(selected)) {
+            events.sort(Comparator.comparing(Event::getName));
+        } else {
+            events.sort(Comparator.comparing(Event::getDateTime));
+        }
+        updateDisplay();
     }
 }

@@ -1,1 +1,1 @@
-Proof of commits in added file.
+Proof of commits in added png file.
